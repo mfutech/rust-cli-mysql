@@ -11,7 +11,6 @@ use env_logger;
 
 // mysql database
 use mysql::*;
-use mysql::prelude::*;
 
 mod cmd_test;
 mod config;
@@ -19,12 +18,6 @@ mod config;
 #[derive(Debug)]
 struct ConfigError(String);
 
-#[derive(Debug,PartialEq,Eq,Clone)]
-struct TestRow{
-    id: i64,
-    key: String,
-    value: String
-}
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     // initialize logging environement
@@ -38,17 +31,20 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         "mysql://{}:{}@{}:{}/{}", 
         params.username, params.password, params.hostname, params.port, params.database
     );
-    println!("connecting to {}", connect_string.clone());
+    
     let mysql_opts = Opts::from_url(&connect_string)?;
 
     let pool = mysql::Pool::new(mysql_opts).unwrap();
     let mut conn = pool.get_conn()?;
-    let _qres = conn.query_map(
-        "SELECT id, mykey, myvalue FROM Test",
-        |(id, key, value) | {
-            let row = TestRow { id, key, value };
-            println!("{:?}", row.clone());
-        })?;
     
+    match &params.command as &str {
+        "test" => {
+            cmd_test::cmd_test(conn)?
+        },
+        _ => {
+            println!("current known commands : test")
+        }
+    } 
+
     Ok(())
 }
