@@ -1,11 +1,11 @@
 // cli arguments
 use structconf::{clap, StructConf, Error};
-
+use structconf::clap::Arg;
 
 #[derive(Debug,StructConf,Clone)]
 pub struct Params {
     /// command to be executed
-    #[conf(no_file, help="command to run")]
+    #[conf(no_file, no_short, help="command to run")]
     pub command: String,
     /// database server
     #[conf(help="database server address, default to 127.0.0.1", default=String::from("localhost"))]
@@ -23,11 +23,23 @@ pub struct Params {
     pub database: String
 }
 
+/*
+impl Default for Params {
+    fn default() -> Self { 
+
+    }
+}
+*/
+
 pub fn get_config() -> Result<Params, Error> {
     // take care of CLI arguments
-    let app = clap::App::new("app");
-    //let args = Params::parse_args(app);
-    let args = Params::parse(app, "./config.ini")?;
+    let app = clap::App::new("cli-mysql")
+        .author("mfutech@mail.com")
+        .arg(Arg::with_name("cmd").index(1).required(true).help("command to launch"));
+        //let args = Params::parse_args(app);
+    let mut args = Params::parse(app.clone(), "./config.ini")?;
+    args.command = String::from(app.get_matches().value_of("cmd").unwrap());
+    println!("{:?}", args.clone());
     Ok(args)
     /*
     let path = match args.value_of("config_path") {
