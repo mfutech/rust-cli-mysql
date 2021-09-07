@@ -14,7 +14,7 @@ pub struct Params {
     /// config let you define which configfile to load
     //config : String,
     #[conf(help="port of data base, default to 3306(mysql)", default="3306")]
-    pub port: i64,
+    pub port: u16,
     #[conf(help="database username")]
     pub username: String,
     #[conf(short="P", help="password for connection database")]
