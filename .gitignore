@@ -2,3 +2,4 @@
 .env
 .vscode
 *.ini
+src/config/fixed_key.rs
